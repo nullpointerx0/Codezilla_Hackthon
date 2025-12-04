@@ -1,86 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>SentinelGuard - HTTP Attack Analysis</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTTP Log Analyzer - Attack Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
+    <div class="container">
+        <header>
+            <h1>🛡️ HTTP Log Analyzer</h1>
+            <p class="subtitle">Detect URL-based attacks in HTTP logs</p>
+        </header>
 
-<!-- TOP NAV -->
-<div class="topbar">
-    <div>
-        <div class="logo">
-            <span class="sg-main">Sentinel</span><span class="sg-accent">Guard</span>
+        <div class="upload-section">
+            <div class="upload-box" id="uploadBox">
+                <div class="upload-content" id="uploadContent">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <h3>Upload CSV Log File</h3>
+                    <p>Click to browse or drag and drop</p>
+                    <p class="file-info">Accepted format: CSV with 'url' and 'status_code' columns</p>
+                </div>
+            </div>
+            
+            <form id="uploadForm" method="POST" action="{{ url_for('upload_file') }}" enctype="multipart/form-data">
+                <input type="file" name="file" id="formFileInput" accept=".csv" style="display: none;" required>
+                <button type="submit" id="submitBtn" class="btn-primary" disabled>Analyze Logs</button>
+            </form>
+
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Uploading and analyzing logs...</p>
+            </div>
+
+            <div id="errorSection" class="error-section" style="display: none;">
+                <div class="error-message">
+                    <span class="error-icon">⚠️</span>
+                    <span id="errorText"></span>
+                </div>
+            </div>
         </div>
-        <div class="subtitle">Forensic HTTP Attack Analysis</div>
+
+        <div id="statsSection" class="stats-section" style="display: none;">
+            <h2>Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalRequests">0</div>
+                    <div class="stat-label">Total Requests</div>
+                </div>
+                <div class="stat-card normal">
+                    <div class="stat-value" id="normalCount">0</div>
+                    <div class="stat-label">Normal</div>
+                </div>
+                <div class="stat-card attempted">
+                    <div class="stat-value" id="attemptedCount">0</div>
+                    <div class="stat-label">Attempted Attacks</div>
+                </div>
+                <div class="stat-card successful">
+                    <div class="stat-value" id="successfulCount">0</div>
+                    <div class="stat-label">Successful Attacks</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultsSection" class="results-section" style="display: none;">
+            <div class="results-header">
+                <h2>Analysis Results</h2>
+                <div class="controls">
+                    <input type="text" id="searchInput" placeholder="Search URLs..." class="search-input">
+                    <select id="filterClassification" class="filter-select">
+                        <option value="">All Classifications</option>
+                        <option value="Normal">Normal</option>
+                        <option value="Attempted Attack">Attempted Attack</option>
+                        <option value="Likely Successful Attack">Likely Successful Attack</option>
+                    </select>
+                    <select id="filterSeverity" class="filter-select">
+                        <option value="">All Severities</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                    </select>
+                    <button id="exportBtn" class="btn-secondary">Export CSV</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="resultsTable" class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Row</th>
+                            <th>Method</th>
+                            <th>URL</th>
+                            <th>Status Code</th>
+                            <th>Classification</th>
+                            <th>Attack Type</th>
+                            <th>Severity</th>
+                            <th>Indicators</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                    </tbody>
+                </table>
+            </div>
+            <div id="noResults" class="no-results" style="display: none;">
+                <p>No results match your filters.</p>
+            </div>
+        </div>
+
+        <div id="sessionsSection" class="results-section" style="display: none;">
+            <div class="results-header">
+                <h2>Session Analysis</h2>
+            </div>
+            <div class="table-container">
+                <table id="sessionsTable" class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Session</th>
+                            <th>Requests</th>
+                            <th>Normal</th>
+                            <th>Attempted</th>
+                            <th>Successful</th>
+                            <th>Unique URLs</th>
+                            <th>Methods</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessionsBody"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
-    <form id="uploadForm" enctype="multipart/form-data" method="POST">
-        <label for="logInput" class="upload-btn">⬆ Upload Logs</label>
-        <input id="logInput" type="file" name="file" accept=".csv" hidden>
-    </form>
-</div>
-
-<!-- MAIN BODY -->
-<div class="content">
-
-    <!-- STAT CARDS -->
-    <div class="cards">
-        <div class="card">
-            <div class="card-title">Total Events</div>
-            <div class="card-value" id="totalEvents">0</div>
-            <div class="card-desc">All HTTP Requests</div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Detected Attacks</div>
-            <div class="card-value" id="detectedAttacks">0</div>
-            <div class="card-desc">SQLi, XSS, CMD, LFI</div>
-        </div>
-
-        <div class="card critical">
-            <div class="card-title">Critical</div>
-            <div class="card-value" id="criticalCount">0</div>
-            <div class="card-desc">Successful Intrusions</div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Unique IPs</div>
-            <div class="card-value" id="uniqueIP">0</div>
-            <div class="card-desc">Distinct Sources</div>
-        </div>
-    </div>
-
-    <!-- EVENT TABLE -->
-    <div class="box-lg">
-        <div class="box-title-row">
-            <div class="box-title">Event Log</div>
-            <input id="searchBox" type="text" placeholder="Search... IP, URL" class="search-box">
-        </div>
-
-        <table class="log-table">
-            <thead>
-                <tr>
-                    <th>Timestamp</th>
-                    <th>IP</th>
-                    <th>Method</th>
-                    <th>URL</th>
-                    <th>Attack</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody id="logBody"></tbody>
-        </table>
-    </div>
-
-</div>
-
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
