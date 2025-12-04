@@ -1,79 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>SentinelGuard - HTTP Attack Analysis</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="stylesheet" href="/static/style.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <title>SentinelGuard – HTTP Threat Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
-
 <body>
 
-<div class="topbar">
-    <div class="logo">
-        <span class="title-main">Sentinel</span><span class="title-accent">Guard</span>
-        <p class="subtitle">Forensic HTTP Attack Analysis</p>
-    </div>
-
-    <form action="/upload" method="POST" enctype="multipart/form-data">
-        <label class="upload-btn" for="upload">⬆ Upload Logs</label>
-        <input type="file" name="file" id="upload" accept=".csv" hidden>
-    </form>
+<div class="top-bar">
+  <h1 class="logo">Sentinel<span>Guard</span></h1>
+  <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+    ⬆ Upload Log
+  </button>
+  <input type="file" id="fileInput" style="display:none" onchange="uploadFile()">
 </div>
 
-<div class="content">
+<div class="container">
 
-<div class="cards">
+  <!-- CARDS -->
+  <div class="grid-cards">
     <div class="card">
-        <div class="card-title">Total Events</div>
-        <div class="card-value" id="totalEvents">0</div>
-        <div class="card-desc">All HTTP Requests</div>
-    </div>
-
-    <div class="card">
-        <div class="card-title">Detected Attacks</div>
-        <div class="card-value" id="detectedAttacks">0</div>
-        <div class="card-desc">SQLi, XSS, CMD, LFI</div>
-    </div>
-
-    <div class="card critical">
-        <div class="card-title">Critical</div>
-        <div class="card-value" id="criticalCount">0</div>
-        <div class="card-desc">Successful Intrusions</div>
+      <h3>Total Events</h3>
+      <h2 id="totalEvents">0</h2>
+      <p>All HTTP Requests</p>
     </div>
 
     <div class="card">
-        <div class="card-title">Unique IPs</div>
-        <div class="card-value" id="uniqueIP">0</div>
-        <div class="card-desc">Distinct Sources</div>
-    </div>
-</div>
-
-<div class="box-lg">
-    <div class="box-title-row">
-        <div class="box-title">Event Log</div>
-        <input type="text" id="searchBox" placeholder="Search... IP, URL" class="search-box">
+      <h3>Detected Attacks</h3>
+      <h2 id="totalAttacks">0</h2>
+      <p>SQLi, XSS, CMD, LFI</p>
     </div>
 
-    <table class="log-table">
-        <thead>
-        <tr>
-            <th>Timestamp</th>
-            <th>IP</th>
-            <th>Method</th>
-            <th>URL</th>
-            <th>Attack</th>
-            <th>Status</th>
-        </tr>
-        </thead>
-        <tbody id="logBody"></tbody>
+    <div class="card red">
+      <h3>Critical</h3>
+      <h2 id="criticalCount">0</h2>
+      <p>Successful intrusions</p>
+    </div>
+
+    <div class="card">
+      <h3>Unique IPs</h3>
+      <h2 id="uniqueIP">0</h2>
+      <p>Distinct sources</p>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <div class="chart-box">
+    <h2>Threat Distribution</h2>
+    <canvas id="attackChart"></canvas>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-box">
+    <div class="table-header">
+      <h2>Event Log</h2>
+      <input type="text" id="filterInput" placeholder="Search... IP, URL" onkeyup="filterData()">
+    </div>
+    <table>
+      <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>IP</th>
+        <th>Method</th>
+        <th>URL</th>
+        <th>Attack</th>
+        <th>Status</th>
+      </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
     </table>
-</div>
+  </div>
 
 </div>
 
-<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/static/script.js"></script>
 </body>
 </html>
