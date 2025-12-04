@@ -1,100 +1,49 @@
-let tableData = [];
+let dataCache = [];
 
-async function uploadFile() {
-  let file = document.getElementById("fileInput").files[0];
-  if (!file) return alert("Select a file first!");
+function updateUI(stats, logs) {
+    document.getElementById("totalEvents").textContent = stats.total;
+    document.getElementById("detectedAttacks").textContent = stats.detected;
+    document.getElementById("criticalCount").textContent = stats.critical;
+    document.getElementById("uniqueIP").textContent = stats.unique;
 
-  let form = new FormData();
-  form.append("file", file);
-
-  await fetch("/api/upload", {
-    method: "POST",
-    body: form
-  });
-
-  loadResults();
+    renderTable(logs);
 }
 
-// Load results from API
-async function loadResults() {
-  const res = await fetch("/api/results");
-  tableData = await res.json();
+function renderTable(logs) {
+    let body = document.getElementById("logBody");
+    body.innerHTML = "";
 
-  renderTable(tableData);
-  updateStats(tableData);
-  renderChart(tableData);
+    logs.forEach(e => {
+        let row = `
+        <tr>
+            <td>${e.timestamp}</td>
+            <td>${e.ip}</td>
+            <td>${e.method}</td>
+            <td>${e.url}</td>
+            <td>${e.attack || ""}</td>
+            <td>${e.status}</td>
+        </tr>`;
+        body.innerHTML += row;
+    });
 }
 
-function renderTable(data) {
-  let body = document.getElementById("tableBody");
-  body.innerHTML = "";
+// Auto POST when file uploaded
+function handleFileUpload() {
+    let input = document.getElementById("upload");
 
-  data.forEach(row => {
-    body.innerHTML += `
-    <tr>
-      <td>${row.timestamp || '-'}</td>
-      <td>${row.ip}</td>
-      <td>${row.method}</td>
-      <td>${row.url}</td>
-      <td>${row.attack_type}</td>
-      <td>${row.classification}</td>
-    </tr>`;
-  });
+    input.addEventListener("change", async () => {
+        let formData = new FormData();
+        formData.append("file", input.files[0]);
+
+        let res = await fetch("/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        let data = await res.json();
+        dataCache = data.results;
+        updateUI(data.stats, data.results);
+    });
 }
 
-function updateStats(data) {
-  document.getElementById("totalEvents").innerText = data.length;
-  document.getElementById("uniqueIP").innerText =
-    new Set(data.map(item => item.ip)).size;
-
-  let attacks = data.filter(d => d.attack_type !== "Normal").length;
-  document.getElementById("totalAttacks").innerText = attacks;
-
-  let critical = data.filter(d => d.classification === "Successful").length;
-  document.getElementById("criticalCount").innerText = critical;
-}
-
-function renderChart(data) {
-  let counts = {
-    SQLi: 0,
-    XSS: 0,
-    CMD: 0,
-    LFI: 0
-  };
-
-  data.forEach(d => {
-    if (counts[d.attack_type] !== undefined) {
-      counts[d.attack_type]++;
-    }
-  });
-
-  new Chart(document.getElementById("attackChart"), {
-    type: "doughnut",
-    data: {
-      labels: ["SQLi", "XSS", "CMD", "LFI"],
-      datasets: [{
-        data: [
-          counts.SQLi,
-          counts.XSS,
-          counts.CMD,
-          counts.LFI
-        ],
-        backgroundColor: [
-          "#8b5cf6", "#facc15", "#ef4444", "#3b82f6"
-        ]
-      }]
-    }
-  });
-}
-
-// Search filter
-function filterData() {
-  let q = document.getElementById("filterInput").value.toLowerCase();
-
-  let filtered = tableData.filter(r =>
-    r.ip.toLowerCase().includes(q) ||
-    r.url.toLowerCase().includes(q)
-  );
-
-  renderTable(filtered);
-}
+handleFileUpload();
