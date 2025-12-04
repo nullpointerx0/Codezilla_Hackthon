@@ -22,22 +22,26 @@ body {
   border-bottom: 1px solid #13284C;
 }
 
-.logo .title-main {
-  color: #fff;
+.logo {
+  line-height: 1.1;
+}
+
+.sg-main {
+  color: white;
   font-size: 28px;
   font-weight: 700;
 }
 
-.title-accent {
+.sg-accent {
   color: #3DA9FC;
   font-size: 28px;
   font-weight: 700;
 }
 
 .subtitle {
-  color: #82A0C4;
-  margin-top: 2px;
-  font-size: 12px;
+  margin-top: 3px;
+  font-size: 13px;
+  color: #7B93B3;
 }
 
 /* UPLOAD BUTTON */
@@ -87,13 +91,13 @@ body {
   margin-top: 5px;
 }
 
-/* CRITICAL */
+/* CRITICAL CARD */
 .card.critical {
   background: #2E0C0C;
   border: 1px solid #661313;
 }
 
-/* LARGE BOX */
+/* SECTION BOX */
 .box-lg {
   background: #0D1E38;
   border: 1px solid #13284C;
@@ -105,10 +109,8 @@ body {
 .box-title {
   font-size: 18px;
   color: #fff;
-  margin-bottom: 16px;
 }
 
-/* SEARCH & TABLE */
 .box-title-row {
   display: flex;
   justify-content: space-between;
@@ -118,18 +120,20 @@ body {
 .search-box {
   background: #09111F;
   border: 1px solid #13284C;
-  padding: 8px 12px;
+  padding: 7px 12px;
   border-radius: 6px;
   color: white;
 }
 
+/* TABLE */
 .log-table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 14px;
 }
 
-.log-table th, .log-table td {
+.log-table th,
+.log-table td {
   padding: 12px 10px;
   border-bottom: 1px solid #13284C;
 }
