@@ -1,49 +1,53 @@
-let dataCache = [];
+let logData = [];
 
-function updateUI(stats, logs) {
-    document.getElementById("totalEvents").textContent = stats.total;
-    document.getElementById("detectedAttacks").textContent = stats.detected;
-    document.getElementById("criticalCount").textContent = stats.critical;
-    document.getElementById("uniqueIP").textContent = stats.unique;
+document.getElementById("logInput").addEventListener("change", async function() {
+    let file = this.files[0];
+    let formData = new FormData();
+    formData.append("file", file);
 
-    renderTable(logs);
-}
+    let res = await fetch("/upload", {
+        method: "POST",
+        body: formData
+    });
 
-function renderTable(logs) {
+    let data = await res.json();
+
+    // Update Stats
+    document.getElementById("totalEvents").textContent = data.stats.total || 0;
+    document.getElementById("detectedAttacks").textContent = data.stats.detected || 0;
+    document.getElementById("criticalCount").textContent = data.stats.critical || 0;
+    document.getElementById("uniqueIP").textContent = data.stats.unique || 0;
+
+    // Store logs
+    logData = data.results;
+    renderTable(logData);
+});
+
+function renderTable(data) {
     let body = document.getElementById("logBody");
     body.innerHTML = "";
 
-    logs.forEach(e => {
-        let row = `
+    data.forEach(row => {
+        let html = `
         <tr>
-            <td>${e.timestamp}</td>
-            <td>${e.ip}</td>
-            <td>${e.method}</td>
-            <td>${e.url}</td>
-            <td>${e.attack || ""}</td>
-            <td>${e.status}</td>
-        </tr>`;
-        body.innerHTML += row;
+            <td>${row.timestamp}</td>
+            <td>${row.ip}</td>
+            <td>${row.method}</td>
+            <td>${row.url}</td>
+            <td>${row.attack || ""}</td>
+            <td>${row.status}</td>
+        </tr>
+        `;
+        body.innerHTML += html;
     });
 }
 
-// Auto POST when file uploaded
-function handleFileUpload() {
-    let input = document.getElementById("upload");
-
-    input.addEventListener("change", async () => {
-        let formData = new FormData();
-        formData.append("file", input.files[0]);
-
-        let res = await fetch("/upload", {
-            method: "POST",
-            body: formData
-        });
-
-        let data = await res.json();
-        dataCache = data.results;
-        updateUI(data.stats, data.results);
-    });
-}
-
-handleFileUpload();
+// SEARCH FILTER
+document.getElementById("searchBox").addEventListener("input", function() {
+    let q = this.value.toLowerCase();
+    let filtered = logData.filter(e =>
+        (e.ip && e.ip.toLowerCase().includes(q)) ||
+        (e.url && e.url.toLowerCase().includes(q))
+    );
+    renderTable(filtered);
+});

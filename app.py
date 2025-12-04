@@ -1,13 +1,13 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 import csv
 import io
-from attack_detector import AttackDetector
+# from attack_detector import AttackDetector
 
 
 app = Flask(__name__)
 
 
-detector = AttackDetector()
+# detector = AttackDetector()
 
 @app.route('/')
 def index():

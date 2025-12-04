@@ -1,79 +1,86 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>SentinelGuard – HTTP Threat Dashboard</title>
-  <link rel="stylesheet" href="/static/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<title>SentinelGuard - HTTP Attack Analysis</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
 
-<div class="top-bar">
-  <h1 class="logo">Sentinel<span>Guard</span></h1>
-  <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
-    ⬆ Upload Log
-  </button>
-  <input type="file" id="fileInput" style="display:none" onchange="uploadFile()">
+<!-- TOP NAV -->
+<div class="topbar">
+    <div>
+        <div class="logo">
+            <span class="sg-main">Sentinel</span><span class="sg-accent">Guard</span>
+        </div>
+        <div class="subtitle">Forensic HTTP Attack Analysis</div>
+    </div>
+
+    <form id="uploadForm" enctype="multipart/form-data" method="POST">
+        <label for="logInput" class="upload-btn">⬆ Upload Logs</label>
+        <input id="logInput" type="file" name="file" accept=".csv" hidden>
+    </form>
 </div>
 
-<div class="container">
+<!-- MAIN BODY -->
+<div class="content">
 
-  <!-- CARDS -->
-  <div class="grid-cards">
-    <div class="card">
-      <h3>Total Events</h3>
-      <h2 id="totalEvents">0</h2>
-      <p>All HTTP Requests</p>
+    <!-- STAT CARDS -->
+    <div class="cards">
+        <div class="card">
+            <div class="card-title">Total Events</div>
+            <div class="card-value" id="totalEvents">0</div>
+            <div class="card-desc">All HTTP Requests</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Detected Attacks</div>
+            <div class="card-value" id="detectedAttacks">0</div>
+            <div class="card-desc">SQLi, XSS, CMD, LFI</div>
+        </div>
+
+        <div class="card critical">
+            <div class="card-title">Critical</div>
+            <div class="card-value" id="criticalCount">0</div>
+            <div class="card-desc">Successful Intrusions</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Unique IPs</div>
+            <div class="card-value" id="uniqueIP">0</div>
+            <div class="card-desc">Distinct Sources</div>
+        </div>
     </div>
 
-    <div class="card">
-      <h3>Detected Attacks</h3>
-      <h2 id="totalAttacks">0</h2>
-      <p>SQLi, XSS, CMD, LFI</p>
-    </div>
+    <!-- EVENT TABLE -->
+    <div class="box-lg">
+        <div class="box-title-row">
+            <div class="box-title">Event Log</div>
+            <input id="searchBox" type="text" placeholder="Search... IP, URL" class="search-box">
+        </div>
 
-    <div class="card red">
-      <h3>Critical</h3>
-      <h2 id="criticalCount">0</h2>
-      <p>Successful intrusions</p>
+        <table class="log-table">
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>IP</th>
+                    <th>Method</th>
+                    <th>URL</th>
+                    <th>Attack</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="logBody"></tbody>
+        </table>
     </div>
-
-    <div class="card">
-      <h3>Unique IPs</h3>
-      <h2 id="uniqueIP">0</h2>
-      <p>Distinct sources</p>
-    </div>
-  </div>
-
-  <!-- CHART -->
-  <div class="chart-box">
-    <h2>Threat Distribution</h2>
-    <canvas id="attackChart"></canvas>
-  </div>
-
-  <!-- TABLE -->
-  <div class="table-box">
-    <div class="table-header">
-      <h2>Event Log</h2>
-      <input type="text" id="filterInput" placeholder="Search... IP, URL" onkeyup="filterData()">
-    </div>
-    <table>
-      <thead>
-      <tr>
-        <th>Timestamp</th>
-        <th>IP</th>
-        <th>Method</th>
-        <th>URL</th>
-        <th>Attack</th>
-        <th>Status</th>
-      </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-  </div>
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="/static/script.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
