@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SentinelGuard – HTTP Threat Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="top-bar">
+  <h1 class="logo">Sentinel<span>Guard</span></h1>
+  <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+    ⬆ Upload Log
+  </button>
+  <input type="file" id="fileInput" style="display:none" onchange="uploadFile()">
+</div>
+
+<div class="container">
+
+  <!-- CARDS -->
+  <div class="grid-cards">
+    <div class="card">
+      <h3>Total Events</h3>
+      <h2 id="totalEvents">0</h2>
+      <p>All HTTP Requests</p>
+    </div>
+
+    <div class="card">
+      <h3>Detected Attacks</h3>
+      <h2 id="totalAttacks">0</h2>
+      <p>SQLi, XSS, CMD, LFI</p>
+    </div>
+
+    <div class="card red">
+      <h3>Critical</h3>
+      <h2 id="criticalCount">0</h2>
+      <p>Successful intrusions</p>
+    </div>
+
+    <div class="card">
+      <h3>Unique IPs</h3>
+      <h2 id="uniqueIP">0</h2>
+      <p>Distinct sources</p>
+    </div>
+  </div>
+
+  <!-- CHART -->
+  <div class="chart-box">
+    <h2>Threat Distribution</h2>
+    <canvas id="attackChart"></canvas>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-box">
+    <div class="table-header">
+      <h2>Event Log</h2>
+      <input type="text" id="filterInput" placeholder="Search... IP, URL" onkeyup="filterData()">
+    </div>
+    <table>
+      <thead>
+      <tr>
+        <th>Timestamp</th>
+        <th>IP</th>
+        <th>Method</th>
+        <th>URL</th>
+        <th>Attack</th>
+        <th>Status</th>
+      </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/static/script.js"></script>
+</body>
+</html>
