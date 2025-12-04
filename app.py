@@ -32,7 +32,7 @@ def upload_file():
         csv_reader = csv.DictReader(stream)
         results = []
         row_num = 0
-            for row in csv_reader:
+        for row in csv_reader:
             if not row or len(row) == 0: # Skip empty rows
                 continue 
             row_num += 1
@@ -61,6 +61,15 @@ def upload_file():
                 except:
                     return False
 
+
+            for col_name in ['url', 'URL', 'request_url', 'path', 'request', 'Request-URL']:
+                val = row.get(col_name)
+                url = safe_str(val)
+                if url:
+                    break
+
+    finally:
+            pass
 
 
 
