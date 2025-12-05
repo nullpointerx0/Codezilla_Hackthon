@@ -127,7 +127,6 @@ uploadForm.addEventListener('submit', async function(e) {
         allResults = data.results || [];
         displayStats(data.stats || {});
         displayResults(allResults);
-        displaySessions(data.sessions || []);
         
         // Scroll to results
         statsSection.scrollIntoView({ behavior: 'smooth' });
@@ -244,26 +243,4 @@ function showError(message) {
     document.getElementById('errorText').textContent = message;
     errorSection.style.display = 'block';
     loading.style.display = 'none';
-}
-function displaySessions(sessions) {
-    const body = document.getElementById('sessionsBody');
-    const section = document.getElementById('sessionsSection');
-    if (!body || !section) return;
-    if (!sessions || sessions.length === 0) {
-        body.innerHTML = '';
-        section.style.display = 'none';
-        return;
-    }
-    body.innerHTML = sessions.map(s => `
-        <tr>
-            <td title="${escapeHtml(s.session)}">${escapeHtml(s.session)}</td>
-            <td>${s.requests}</td>
-            <td>${s.normal}</td>
-            <td>${s.attempted}</td>
-            <td>${s.successful}</td>
-            <td>${s.unique_urls}</td>
-            <td>${escapeHtml((s.methods || []).join(', '))}</td>
-        </tr>
-    `).join('');
-    section.style.display = 'block';
 }

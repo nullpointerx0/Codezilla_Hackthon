@@ -19,7 +19,7 @@ class AttackDetector:
                     self.use_llm = False
             except Exception:
                 self.use_llm = False
-        # SQL Injection patterns
+        # SQL 
         self.sql_patterns = [
             r"(?i)(union\s+select|select\s+.*\s+from|insert\s+into|delete\s+from|drop\s+table)",
             r"(?i)(or\s+1\s*=\s*1|or\s+'1'\s*=\s*'1'|or\s+\"1\"\s*=\s*\"1\")",
@@ -31,7 +31,7 @@ class AttackDetector:
             r"(?i)(benchmark\s*\(|sleep\s*\(|waitfor\s+delay)",
         ]
         
-        # XSS patterns
+        # XSS 
         self.xss_patterns = [
             r"(?i)(<script[^>]*>.*?</script>)",
             r"(?i)(javascript\s*:)",
@@ -43,7 +43,7 @@ class AttackDetector:
             r"(?i)(data:text/html|vbscript:|livescript:)",
         ]
         
-        # Command Injection patterns
+        # Command 
         self.command_injection_patterns = [
             r"(?i)(;\s*(rm\s+-rf|cat\s+/etc/passwd|ls\s+-la|pwd|whoami|id))",
             r"(?i)(\|\s*(rm|cat|ls|nc|wget|curl|bash|sh))",
@@ -55,7 +55,7 @@ class AttackDetector:
             r"(?i)(/bin/(sh|bash|zsh|csh)|cmd\.exe|powershell)",
         ]
         
-        # SSRF patterns
+        # SSRF 
         self.ssrf_patterns = [
             r"(?i)(http://(127\.0\.0\.1|localhost|0\.0\.0\.0|169\.254\.169\.254))",
             r"(?i)(http://(10\.|172\.(1[6-9]|2[0-9]|3[01])\.|192\.168\.))",
@@ -65,7 +65,7 @@ class AttackDetector:
             r"(?i)(http://.*@.*@.*)",
         ]
         
-        # Directory Traversal patterns
+        # Directory Traversal 
         self.directory_traversal_patterns = [
             r"(\.\./){2,}",
             r"(\.\.\\\\){2,}",
@@ -75,7 +75,7 @@ class AttackDetector:
             r"(?i)(\.\./\.\./\.\./\.\./)",
         ]
         
-        # Credential Stuffing patterns
+        # Credential Stuffing 
         self.credential_stuffing_patterns = [
             r"(?i)(/login|/signin|/auth|/authenticate).*password",
             r"(?i)(password=.*(admin|123456|password|qwerty|letmein|welcome|monkey|1234567890))",
@@ -83,7 +83,7 @@ class AttackDetector:
             r"(?i)(login.*failed|authentication.*failed|invalid.*credentials)",
         ]
         
-        # Compile all patterns for efficiency
+        
         self.compiled_patterns = {
             'SQL Injection': [re.compile(p) for p in self.sql_patterns],
             'XSS': [re.compile(p) for p in self.xss_patterns],
