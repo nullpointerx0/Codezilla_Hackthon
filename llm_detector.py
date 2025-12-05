@@ -14,7 +14,7 @@ class LLMAttackDetector:
             "Directory Traversal",
             "Credential Stuffing",
         ]
-        self.threshold = float(os.getenv("LLM_ATTACK_THRESHOLD", "0.7"))
+        self.threshold = float(os.getenv("LLM_ATTACK_THRESHOLD", "0.6"))
         model_name = os.getenv("LLM_MODEL", "MoritzLaurer/deberta-v3-large-zeroshot-v2")
         hypothesis_cls = os.getenv("LLM_HYPOTHESIS_CLS", "This URL is {label}.")
         hypothesis_attack = os.getenv("LLM_HYPOTHESIS_ATTACK", "The attack type is {label}.")
